@@ -56,7 +56,7 @@ namespace myEthernetTest
                 {
                     HEADER head = HEADER.GetHeaderInfo(pack.buf);
                     HEADER obj = CreateIcdObject((COMMAND)head.id);
-                    obj.Update(pack.buf);
+                    HEADER.Deserialize(obj, ref pack.buf);
                     OnRecv.Invoke(pack.ClientID, obj);
                 }
 

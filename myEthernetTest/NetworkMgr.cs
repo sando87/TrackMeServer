@@ -30,6 +30,7 @@ namespace myEthernetTest
             public int id { get; set; }
             public TcpClient client { get; set; }
             public MemoryStream mem { get; set; }
+            public string userName { get; set; }
         }
 
         private const int PORTNUM                   = 7000;
@@ -37,9 +38,10 @@ namespace myEthernetTest
         private const int MAX_CLIENT_BUF            = 4096;
         private const int MAX_SOCKET_BUF            = 1024;
 
-        private ClientBuf[] mClients                = new ClientBuf[MAX_CLIENT_CNT];
-        private ConcurrentQueue<QueuePack> mQueue    = new ConcurrentQueue<QueuePack>();
-        private ManualResetEvent mMRE                = new ManualResetEvent(false);
+        private Dictionary<string, int> mUserNameMap    = new Dictionary<string, int>();
+        private ClientBuf[]             mClients        = new ClientBuf[MAX_CLIENT_CNT];
+        private ConcurrentQueue<QueuePack>  mQueue      = new ConcurrentQueue<QueuePack>();
+        private ManualResetEvent            mMRE        = new ManualResetEvent(false);
 
         public event EventHandler mRecv = null;
 
@@ -84,6 +86,33 @@ namespace myEthernetTest
             NetworkStream stream = mClients[idx].client.GetStream();
             stream.Write(buf, 0, buf.Length);
         }
+        public void WriteToClient(string user, byte[] buf)
+        {
+            if ( !mUserNameMap.ContainsKey(user) )
+                return;
+
+            int id = mUserNameMap[user];
+            NetworkStream stream = mClients[id].client.GetStream();
+            stream.Write(buf, 0, buf.Length);
+        }
+        public void LoginUser(int id, string UserName)
+        {
+            int idx = id;
+            if (mClients[idx] == null)
+                return;
+
+            mClients[idx].userName = UserName;
+            mUserNameMap[UserName] = id;
+        }
+        public void LogoutUser(string UserName)
+        {
+            if (!mUserNameMap.ContainsKey(UserName))
+                return;
+
+            int id = mUserNameMap[UserName];
+            mClients[id].userName = null;
+            mUserNameMap.Remove(UserName);
+        }
 
         private int findEmptyID()
         {
@@ -106,6 +135,7 @@ namespace myEthernetTest
             mClients[idx].id = newID;
             mClients[idx].client = newClient;
             mClients[idx].mem = new MemoryStream(MAX_CLIENT_BUF);
+            mClients[idx].userName = null;
 
             Task.Factory.StartNew(waitClient, mClients[idx]);
             return newID;
@@ -173,9 +203,13 @@ namespace myEthernetTest
             clientPack.mem.Close();
             clientPack.client.Close();
 
+            if (clientPack.userName != null)
+                mUserNameMap.Remove(clientPack.userName);
+
             clientPack.id = -1;
             clientPack.client = null;
             clientPack.mem = null;
+            clientPack.userName = null;
             mClients[idx] = null;
         }
     }

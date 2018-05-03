@@ -23,7 +23,7 @@ namespace myEthernetTest
             IcdMgr.OnRecv += (s, e) =>
             {
                 ICD.HEADER obj = e as ICD.HEADER;
-                MessageHandler(obj);
+                MessageHandler(s, obj);
             };
 
             IcdMgr.StartServiceServer();
@@ -49,7 +49,7 @@ namespace myEthernetTest
             NetworkMgr.GetInst().WriteToClient(clientID, buf);
         }
 
-        private void MessageHandler(ICD.HEADER obj)
+        private void MessageHandler(int clientID, ICD.HEADER obj)
         {
             var id = obj.id;
             switch(id)
@@ -58,7 +58,7 @@ namespace myEthernetTest
                     ICD_NewUser(obj);
                     break;
                 case 1:
-                    ICD_Login(obj);
+                    ICD_Login(clientID, obj);
                     break;
                 case 2:
                     ICD_Logout(obj);
@@ -70,15 +70,38 @@ namespace myEthernetTest
 
         private void ICD_NewUser(ICD.HEADER obj)
         {
-            string userID = "sjlee";
-           // string userPW = "root";
-            if(DatabaseMgr.IsHaveUser(userID))
-            {
+            ICD.User msg = obj as ICD.User;
 
+            if(DatabaseMgr.IsHaveUser(msg.userID))
+            {
+                //send back error msg : same user id
+            }
+            else
+            {
+                //push db new user
+                //ack good
             }
         }
-        private void ICD_Login(ICD.HEADER obj)
+        private void ICD_Login(int clientID, ICD.HEADER obj)
         {
+            ICD.User msg = obj as ICD.User;
+
+            if (DatabaseMgr.IsHaveUser(msg.userID))
+            {
+                //if(isOKpassword)
+                {
+                    //loginUser();
+                    //ack good
+                }
+                //else
+                {
+                    //send back error msg : wrong password
+                }
+            }
+            else
+            {
+                //send back error msg : no user id
+            }
 
         }
         private void ICD_Logout(ICD.HEADER obj)

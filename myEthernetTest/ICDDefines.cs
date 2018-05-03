@@ -61,11 +61,6 @@ namespace myEthernetTest
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 30)]
             public string time;
 
-            public virtual void Update(byte[] buf)
-            {
-                Deserialize(this, ref buf);
-            }
-
             static public void HeadBuilder(object obj, COMMAND id, TYPE type)
             {
                 HEADER head = obj as HEADER;
@@ -87,7 +82,7 @@ namespace myEthernetTest
                 int headSize = HeaderSize();
                 byte[] headBuf = new byte[headSize];
                 Array.Copy(buf, headBuf, headSize);
-                obj.Update(headBuf);
+                Deserialize(obj, ref headBuf);
                 return obj;
             }
 
@@ -107,7 +102,7 @@ namespace myEthernetTest
                 return buffer;
             }
 
-            protected void Deserialize(Object obj, ref byte[] data)
+            static public void Deserialize(Object obj, ref byte[] data)
             {
                 var gch = GCHandle.Alloc(data, GCHandleType.Pinned);
                 Marshal.PtrToStructure(gch.AddrOfPinnedObject(), obj);
@@ -124,10 +119,6 @@ namespace myEthernetTest
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
             public string userPW;
 
-            public override void Update(byte[] buf)
-            {
-                Deserialize(this, ref buf);
-            }
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -166,11 +157,6 @@ namespace myEthernetTest
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 20)]
             public string priority;
 
-
-            public override void Update(byte[] buf)
-            {
-                Deserialize(this, ref buf);
-            }
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -193,10 +179,6 @@ namespace myEthernetTest
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
             public string message;
 
-            public override void Update(byte[] buf)
-            {
-                Deserialize(this, ref buf);
-            }
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -223,10 +205,6 @@ namespace myEthernetTest
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1024*4)]
             public byte[] data;
 
-            public override void Update(byte[] buf)
-            {
-                Deserialize(this, ref buf);
-            }
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -235,10 +213,6 @@ namespace myEthernetTest
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
             public string message;
 
-            public override void Update(byte[] buf)
-            {
-                Deserialize(this, ref buf);
-            }
         }
     }
 }

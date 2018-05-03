@@ -20,9 +20,9 @@ namespace myEthernetTest
             InitializeComponent();
 
             //Lambda express
-            IcdMgr.mCallback += (s, e) =>
+            IcdMgr.OnRecv += (s, e) =>
             {
-                ICD.HEADER obj = s as ICD.HEADER;
+                ICD.HEADER obj = e as ICD.HEADER;
                 MessageHandler(obj);
             };
 
@@ -41,7 +41,7 @@ namespace myEthernetTest
         private void button2_Click(object sender, EventArgs e)
         {
             ICD.HEADER head = new ICD.HEADER();
-            head.id = (uint)ICD.COMMAND.START;
+            head.id = (uint)ICD.COMMAND.NewUser;
             head.size = (uint)ICD.HEADER.HeaderSize();
             head.sof = (uint)ICD.MAGIC.SOF;
             head.type = 123;
@@ -71,7 +71,7 @@ namespace myEthernetTest
         private void ICD_NewUser(ICD.HEADER obj)
         {
             string userID = "sjlee";
-            string userPW = "root";
+           // string userPW = "root";
             if(DatabaseMgr.IsHaveUser(userID))
             {
 

@@ -10,7 +10,8 @@ namespace myEthernetTest
 {
     class ICDPacketMgr
     {
-        public event EventHandler mCallback;
+        public delegate void PacketHandler(int clientID, HEADER obj);
+        public event PacketHandler OnRecv;
 
         public void StartServiceServer()
         {
@@ -22,21 +23,25 @@ namespace myEthernetTest
         public int StartServiceClient(string ip, int port)
         {
             NetworkMgr networkMgr = NetworkMgr.GetInst();
-            // networkMgr.mRecv += new EventHandler(OnRecvPacket);
+            networkMgr.mRecv += new EventHandler(OnRecvPacket);
             int clientID = networkMgr.connectServer(ip, port);
-            // networkMgr.startAsync();
+            networkMgr.startAsync();
             return clientID;
         }
         private HEADER CreateIcdObject(COMMAND id)
         {
-            switch(id)
+            switch (id)
             {
-                case COMMAND.START:
-                    return new HEADER();
-                case COMMAND.STOP:
-                    return new ACK();
-                case COMMAND.PARAM:
-                    return new ACK_TEST_A();
+                case COMMAND.NewUser:
+                    return new ICD.User();
+                case COMMAND.NewTask:
+                    return new ICD.Task();
+                case COMMAND.NewChat:
+                    return new ICD.Chat();
+                case COMMAND.UploadFile:
+                    return new ICD.File();
+                case COMMAND.LogMessage:
+                    return new ICD.Message();
                 default:
                     return new HEADER();
             }
@@ -51,8 +56,8 @@ namespace myEthernetTest
                 {
                     HEADER head = HEADER.GetHeaderInfo(pack.buf);
                     HEADER obj = CreateIcdObject((COMMAND)head.id);
-                    HEADER.Deserialize(obj, ref pack.buf);
-                    mCallback.Invoke(obj, null);
+                    obj.Update(pack.buf);
+                    OnRecv.Invoke(pack.ClientID, obj);
                 }
 
                 if (queue.IsEmpty)

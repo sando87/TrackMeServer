@@ -40,13 +40,11 @@ namespace myEthernetTest
 
         private void button2_Click(object sender, EventArgs e)
         {
-            ICD.HEADER head = new ICD.HEADER();
-            head.id = (uint)ICD.COMMAND.NewUser;
-            head.size = (uint)ICD.HEADER.HeaderSize();
-            head.sof = (uint)ICD.MAGIC.SOF;
-            head.type = 123;
-            byte[] buf = ICD.HEADER.Serialize(head);
-            NetworkMgr.GetInst().WriteToClient(clientID, buf);
+            DataRow row = DatabaseMgr.GetUserInfo("root");
+            string id = row["id"].ToString();
+            string pw = row["pw"].ToString();
+            string date = row["date"].ToString();
+            int? auth = row["auth"] as int?;
         }
 
         private void MessageHandler(int clientID, ICD.HEADER obj)

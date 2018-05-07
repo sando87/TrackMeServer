@@ -70,7 +70,7 @@ namespace myEthernetTest
         {
             ICD.User msg = obj as ICD.User;
 
-            if(DatabaseMgr.IsHaveUser(msg.userID))
+            if(DatabaseMgr.GetUserInfo(msg.userID) != null)
             {
                 //send back error msg : same user id
             }
@@ -83,8 +83,8 @@ namespace myEthernetTest
         private void ICD_Login(int clientID, ICD.HEADER obj)
         {
             ICD.User msg = obj as ICD.User;
-
-            if (DatabaseMgr.IsHaveUser(msg.userID))
+            DataRow row = DatabaseMgr.GetUserInfo(msg.userID);
+            if (row != null)
             {
                 //if(isOKpassword)
                 {

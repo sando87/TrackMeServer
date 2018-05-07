@@ -139,11 +139,11 @@ namespace myEthernetTest
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
             public string title;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
-            public string makeUser;
+            public string creator;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
-            public string topUser;
+            public string director;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
-            public string downUser;
+            public string worker;
             [MarshalAs(UnmanagedType.U4)]
             public uint preLaunch;
             [MarshalAs(UnmanagedType.U4)]
